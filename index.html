@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>ParentSquare - Total Team Workload</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      /* Official ParentSquare Palette [cite: 110-119] */
+      --ps-green: #85ad33;
+      --ps-dark-green: #618025;
+      --ps-blue: #7bbaf0;
+      --ps-gold: #f2b001;
+      --ps-light-green: #e5f1d4;
+      --ps-light-gray: #f7f8f8;
+      --ps-dark-gray: #444444;
+      --ps-red: #d9534f;
+      --ps-light-red: #f2dede;
+    }
+
+    * { box-sizing: border-box; font-family: "Montserrat", Arial, sans-serif; }
+    body { margin: 0; background: var(--ps-light-gray); color: var(--ps-dark-gray); }
+    .container { max-width: 1450px; margin: 0 auto; padding: 24px; }
+
+    /* Header & Logo [cite: 4-13] */
+    header { display: flex; align-items: center; gap: 20px; margin-bottom: 30px; }
+    .logo img { height: 40px; width: auto; } 
+    .header-text h1 { color: var(--ps-green); margin: 0; font-size: 24px; font-weight: 700; line-height: 1.2; }
+    .header-text p { margin: 4px 0 0; color: #666; font-size: 14px; font-weight: 600; }
+
+    /* Global Summary Cards */
+    .summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 32px; }
+    .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.05); border-top: 4px solid var(--ps-green); min-height: 120px; display: flex; flex-direction: column; justify-content: center; }
+    .card .main-val { font-size: 22px; font-weight: 700; color: var(--ps-dark-green); }
+    .card .sub-val { font-size: 13px; font-weight: 600; color: #777; margin-top: 4px; }
+    .card .label { font-size: 10px; color: #888; text-transform: uppercase; font-weight: 700; margin-top: 8px; }
+
+    /* Capacity Bar */
+    .summary-cap-bar { height: 8px; background: #eee; border-radius: 4px; margin-top: 10px; overflow: hidden; display: flex; }
+    .cap-fill-deals { height: 100%; background: var(--ps-green); transition: width 0.5s; }
+    .cap-fill-projects { height: 100%; background: var(--ps-blue); transition: width 0.5s; }
+
+    /* Grouping Headers [cite: 25-32] */
+    .group-header { background: var(--ps-light-green); color: var(--ps-dark-green); padding: 8px 12px; margin: 20px 0 10px 0; font-weight: 700; font-size: 11px; text-transform: uppercase; border-radius: 4px; border-left: 4px solid var(--ps-dark-green); }
+
+    /* Controls & Filters */
+    .controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; gap: 15px; flex-wrap: wrap; }
+    .control-group { display: flex; align-items: center; gap: 10px; }
+    .btn-action { background: white; border: 1px solid #ddd; padding: 6px 12px; cursor: pointer; font-size: 11px; font-weight: 600; border-radius: 4px; transition: 0.2s; }
+    .btn-action.active { background: var(--ps-green) !important; color: white !important; border-color: var(--ps-green) !important; }
+    .btn-sort.active-sort { background: var(--ps-blue); color: white; border-color: var(--ps-blue); }
+
+    /* Table & Card Layouts [cite: 74-80] */
+    table { width: 100%; border-collapse: collapse; background: white; border: 1px solid #eee; font-size: 12px; margin-bottom: 10px; }
+    th { background: #f9f9f9; color: var(--ps-dark-gray); padding: 10px; text-align: left; font-size: 10px; text-transform: uppercase; border-bottom: 2px solid #ddd; }
+    td { padding: 10px; border-bottom: 1px solid #eee; vertical-align: middle; }
+    tbody tr:nth-child(even) { background-color: #fafafa; }
+
+    .im-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 15px; margin-bottom: 25px; }
+    .im-card { background: white; padding: 15px; border-radius: 6px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); border-top: 3px solid var(--ps-green); height: 180px; display: flex; flex-direction: column; justify-content: space-between; }
+    .im-card h3 { margin: 0; font-size: 14px; color: var(--ps-dark-green); }
+    .im-card .stats { font-size: 11px; color: #666; line-height: 1.4; }
+
+    /* Modal for Notes */
+    .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 2000; align-items: center; justify-content: center; }
+    .modal { background: white; padding: 20px; border-radius: 8px; width: 350px; }
+    .modal textarea { width: 100%; height: 80px; margin: 10px 0; font-size: 12px; padding: 8px; border: 1px solid #ddd; border-radius: 4px; resize: none; }
+
+    .edit-btn { cursor: pointer; color: var(--ps-blue); font-size: 12px; margin-left: 5px; }
+    
+    footer { text-align: center; padding: 40px; color: var(--ps-dark-gray); font-size: 10px; font-weight: 600; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <div class="logo"><img src="logo.png" alt="ParentSquare"></div>
+    <div class="header-text">
+      <h1>Total Team Workload</h1>
+      <p>Full Roster Visibility & Capacity Comparison</p>
+    </div>
+  </header>
+
+  <div class="summary">
+    <div class="card">
+        <div class="main-val"><span id="total-im-count">0</span> Total IMs</div>
+        <div class="sub-val"><span id="total-strat-proj">0</span> Strategic Projects</div>
+    </div>
+    <div class="card">
+        <div class="main-val"><span id="total-points">0</span> / <span id="total-max-pts">0</span> Total Points</div>
+        <div class="sub-val"><span id="total-deal-pts">0</span> Deal Points</div>
+        <div class="sub-val" style="margin-top:0;"><span id="total-proj-pts">0</span> Project Points</div>
+    </div>
+    <div class="card">
+        <div id="total-cap-pct" class="main-val">0%</div>
+        <div class="summary-cap-bar">
+            <div id="total-fill-deals" class="cap-fill-deals"></div>
+            <div id="total-fill-projects" class="cap-fill-projects"></div>
+        </div>
+        <div class="label">Average Team Capacity Used</div>
+    </div>
+    <div class="card">
+        <div style="background-color: var(--ps-light-red); padding: 4px 8px; border-radius: 4px; display: inline-block; width: fit-content;">
+            <div id="total-risk-deals" class="main-val" style="font-size: 18px;">0 At-Risk Deals</div>
+        </div>
+        <div id="total-risk-breakdown" class="sub-val" style="border-top: none; color: var(--ps-dark-gray);">0Y / 0R Health Breakdown</div>
+        <div id="total-past-due-proj" class="sub-val">0 Past Due Projects</div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <div class="control-group">
+      <button id="btn-list" class="btn-action active" onclick="switchLayout('list')">List View</button>
+      <button id="btn-card" class="btn-action" onclick="onclick="switchLayout('card')">Card View</button>
+    </div>
+    
+    <div class="control-group">
+      <span style="font-size: 10px; font-weight: 700; color: #888; text-transform: uppercase;">Filter Time Zone:</span>
+      <button class="btn-action filter-tz active" onclick="setTZFilter('all', this)">All</button>
+      <button class="btn-action filter-tz" onclick="setTZFilter('EST', this)">EST</button>
+      <button class="btn-action filter-tz" onclick="setTZFilter('CST', this)">CST</button>
+      <button class="btn-action filter-tz" onclick="setTZFilter('PST', this)">PST</button>
+    </div>
+
+    <div class="control-group">
+      <span style="font-size: 10px; font-weight: 700; color: #888; text-transform: uppercase;">Group By:</span>
+      <button id="sort-tier" class="btn-action btn-sort active-sort" onclick="setSort('tier')">Tier ↑↓</button>
+      <button id="sort-cap" class="btn-action btn-sort" onclick="setSort('cap')">% Cap ↑↓</button>
+    </div>
+  </div>
+
+  <div id="team-display"></div>
+
+  <div id="note-modal" class="modal-overlay">
+    <div class="modal">
+      <h3 id="modal-im-name" style="margin:0; font-size:14px; color:var(--ps-dark-green);">Edit Team Note</h3>
+      <textarea id="note-text"></textarea>
+      <div style="display:flex; justify-content:flex-end; gap:8px;">
+        <button class="btn-action" onclick="closeModal()">Cancel</button>
+        <button class="btn-action active" onclick="saveNote()">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <footer>© 2026 ParentSquare • Implementation Manager Dashboard</footer>
+</div>
+
+<script>
+const MPC_VALUES = { "T1": 70, "T2": 90, "T3": 120, "T4": 120, "T5": 90 };
+let currentLayout = 'list', currentSort = 'tier', currentTZ = 'all', sortDir = 'desc', editingIM = null;
+
+// Full Team Roster: 16 IMs
+let teamData = [
+  { name: "Alex R.", tz: "EST", tier: "T4", dealPts: 95, projPts: 20, deals: 14, projects: 3, pastDue: 1, yellowRisk: 2, redRisk: 1 },
+  { name: "Jordan M.", tz: "EST", tier: "T2", dealPts: 65, projPts: 10, deals: 9, projects: 2, pastDue: 0, yellowRisk: 1, redRisk: 0 },
+  { name: "Casey S.", tz: "EST", tier: "T3", dealPts: 45, projPts: 0, deals: 10, projects: 0, pastDue: 0, yellowRisk: 0, redRisk: 0 },
+  { name: "Morgan L.", tz: "EST", tier: "T1", dealPts: 52, projPts: 15, deals: 11, projects: 4, pastDue: 2, yellowRisk: 2, redRisk: 1 },
+  { name: "Riley W.", tz: "EST", tier: "T2", dealPts: 80, projPts: 5, deals: 13, projects: 1, pastDue: 0, yellowRisk: 2, redRisk: 0 },
+  { name: "Taylor B.", tz: "EST", tier: "T3", dealPts: 95, projPts: 25, deals: 14, projects: 5, pastDue: 1, yellowRisk: 2, redRisk: 2 },
+  { name: "Quinn J.", tz: "EST", tier: "T1", dealPts: 30, projPts: 5, deals: 8, projects: 1, pastDue: 0, yellowRisk: 0, redRisk: 0 },
+  { name: "Skyler P.", tz: "EST", tier: "T5", dealPts: 40, projPts: 12, deals: 9, projects: 2, pastDue: 0, yellowRisk: 0, redRisk: 0 },
+  { name: "Dakota H.", tz: "CST", tier: "T4", dealPts: 110, projPts: 10, deals: 15, projects: 1, pastDue: 1, yellowRisk: 1, redRisk: 3 },
+  { name: "Jamie F.", tz: "CST", tier: "T3", dealPts: 85, projPts: 20, deals: 12, projects: 2, pastDue: 0, yellowRisk: 1, redRisk: 1 },
+  { name: "Peyton G.", tz: "CST", tier: "T2", dealPts: 40, projPts: 5, deals: 7, projects: 1, pastDue: 0, yellowRisk: 0, redRisk: 0 },
+  { name: "Reese D.", tz: "CST", tier: "T1", dealPts: 65, projPts: 12, deals: 10, projects: 3, pastDue: 1, yellowRisk: 1, redRisk: 0 },
+  { name: "Charlie K.", tz: "PST", tier: "T4", dealPts: 70, projPts: 40, deals: 11, projects: 6, pastDue: 3, yellowRisk: 2, redRisk: 0 },
+  { name: "Emerson T.", tz: "PST", tier: "T3", dealPts: 110, projPts: 5, deals: 14, projects: 1, pastDue: 0, yellowRisk: 3, redRisk: 1 },
+  { name: "Sutton W.", tz: "PST", tier: "T2", dealPts: 55, projPts: 0, deals: 8, projects: 0, pastDue: 0, yellowRisk: 0, redRisk: 0 },
+  { name: "Blake V.", tz: "PST", tier: "T1", dealPts: 25, projPts: 10, deals: 6, projects: 2, pastDue: 0, yellowRisk: 0, redRisk: 0 }
+];
+
+function updateTeamMetrics() {
+    let tdP = 0, tpP = 0, tM = 0, yR = 0, rR = 0, spC = 0, pdC = 0;
+    const filtered = currentTZ === 'all' ? teamData : teamData.filter(im => im.tz === currentTZ);
+    
+    filtered.forEach(im => {
+        tdP += im.dealPts; tpP += im.projPts; tM += MPC_VALUES[im.tier];
+        spC += im.projects; pdC += im.pastDue; yR += im.yellowRisk; rR += im.redRisk;
+    });
+
+    const totalP = tdP + tpP, cap = Math.round((totalP / tM) * 100);
+    document.getElementById('total-im-count').innerText = filtered.length;
+    document.getElementById('total-strat-proj').innerText = spC;
+    document.getElementById('total-points').innerText = totalP;
+    document.getElementById('total-max-pts').innerText = tM;
+    document.getElementById('total-deal-pts').innerText = tdP;
+    document.getElementById('total-proj-pts').innerText = tpP;
+    document.getElementById('total-cap-pct').innerText = cap + '%';
+    document.getElementById('total-fill-deals').style.width = (tdP/tM*100) + '%';
+    document.getElementById('total-fill-projects').style.width = (tpP/tM*100) + '%';
+    document.getElementById('total-risk-deals').innerText = `${yR + rR} At-Risk Deals`;
+    document.getElementById('total-risk-breakdown').innerText = `${yR}Y / ${rR}R Health Breakdown`;
+    document.getElementById('total-past-due-proj').innerText = `${pdC} Past Due Projects`;
+}
+
+function renderContent() {
+    const display = document.getElementById('team-display');
+    display.innerHTML = '';
+    const filtered = currentTZ === 'all' ? teamData : teamData.filter(im => im.tz === currentTZ);
+    
+    const sorted = [...filtered].sort((a,b) => {
+        let vA = currentSort === 'tier' ? parseInt(a.tier.slice(1)) : (a.dealPts + a.projPts)/MPC_VALUES[a.tier];
+        let vB = currentSort === 'tier' ? parseInt(b.tier.slice(1)) : (b.dealPts + b.projPts)/MPC_VALUES[b.tier];
+        return sortDir === 'desc' ? vB - vA : vA - vB;
+    });
+
+    let groups = {};
+    sorted.forEach(im => {
+        const pct = Math.round(((im.dealPts + im.projPts) / MPC_VALUES[im.tier]) * 100);
+        const key = currentSort === 'tier' ? `Tier ${im.tier.slice(1)}` : (pct >= 90 ? "Critical (90%+)" : (pct >= 80 ? "High (80-89%)" : "Stable (Under 80%)"));
+        if (!groups[key]) groups[key] = []; groups[key].push(im);
+    });
+
+    Object.keys(groups).forEach(key => {
+        const h = document.createElement('div'); h.className = 'group-header'; h.innerText = key; display.appendChild(h);
+        if (currentLayout === 'list') {
+            const t = document.createElement('table');
+            t.innerHTML = `<thead><tr><th>TZ</th><th>IM Name</th><th>Deals (Pts)</th><th>Projs (Pts)</th><th>Total / Cap</th><th>% Cap</th><th>Risks (Y/R|P)</th><th>Notes</th></tr></thead><tbody></tbody>`;
+            display.appendChild(t); const b = t.querySelector('tbody');
+            groups[key].forEach(im => {
+                const m = MPC_VALUES[im.tier], tot = im.dealPts + im.projPts, pct = Math.round((tot/m)*100);
+                const color = pct >= 90 ? 'var(--ps-red)' : (pct >= 80 ? 'var(--ps-gold)' : 'var(--ps-green)');
+                b.innerHTML += `<tr>
+                    <td><span class="btn-action" style="padding:2px 6px; font-size:9px;">${im.tz}</span></td>
+                    <td><strong>${im.name}</strong></td>
+                    <td>${im.deals} (${im.dealPts})</td>
+                    <td>${im.projects} (${im.projPts})</td>
+                    <td><strong>${tot}</strong> / ${m}</td>
+                    <td><span style="color:${color}; font-weight:700;">${pct}%</span></td>
+                    <td>${im.yellowRisk}Y / ${im.redRisk}R | <span style="${im.pastDue > 0 ? 'color:var(--ps-red);font-weight:bold;' : ''}">${im.pastDue}P</span></td>
+                    <td><span class="edit-btn" onclick="openModal('${im.name}')">✎ Note</span></td>
+                </tr>`;
+            });
+        } else {
+            const grid = document.createElement('div'); grid.className = 'im-grid'; display.appendChild(grid);
+            groups[key].forEach(im => {
+                const m = MPC_VALUES[im.tier], tot = im.dealPts + im.projPts, pct = Math.round((tot/m)*100);
+                const color = pct >= 90 ? 'var(--ps-red)' : (pct >= 80 ? 'var(--ps-gold)' : 'var(--ps-green)');
+                grid.innerHTML += `<div class="im-card" style="border-top-color:${color}">
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                        <div><h3>${im.name}</h3><span style="font-size:9px; color:#888;">${im.tz} • Tier ${im.tier.slice(1)}</span></div>
+                        <span style="font-weight:700; color:${color}; font-size:12px;">${pct}%</span>
+                    </div>
+                    <div class="stats">Pts: <b>${tot}</b>/${m} | Deals: ${im.deals} | Projs: ${im.projects}<br>Risks: ${im.yellowRisk}Y/${im.redRisk}R | Projects past due: <b style="${im.pastDue > 0 ? 'color:var(--ps-red);' : ''}">${im.pastDue}</b></div>
+                    <div class="summary-cap-bar" style="height:6px;"><div style="width:${(im.dealPts/m)*100}%; background:var(--ps-green);"></div><div style="width:${(im.projPts/m)*100}%; background:var(--ps-blue);"></div></div>
+                    <div style="text-align:right;"><span class="edit-btn" onclick="openModal('${im.name}')">✎ Manage Note</span></div>
+                </div>`;
+            });
+        }
+    });
+}
+
+function setTZFilter(tz, btn) {
+    currentTZ = tz;
+    document.querySelectorAll('.filter-tz').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    updateTeamMetrics(); renderContent();
+}
+
+function setSort(t) {
+    if (currentSort === t) sortDir = sortDir === 'desc' ? 'asc' : 'desc'; else { currentSort = t; sortDir = 'desc'; }
+    document.querySelectorAll('.btn-sort').forEach(b => b.classList.remove('active-sort'));
+    document.getElementById('sort-'+t).classList.add('active-sort'); renderContent();
+}
+
+function switchLayout(l) { 
+    currentLayout = l; document.getElementById('btn-list').classList.toggle('active', l==='list');
+    document.getElementById('btn-card').classList.toggle('active', l==='card'); renderContent(); 
+}
+
+function openModal(name) { editingIM = name; document.getElementById('modal-im-name').innerText = `Note for ${name}`; document.getElementById('note-text').value = localStorage.getItem('note_team_'+name) || ''; document.getElementById('note-modal').style.display = 'flex'; }
+function closeModal() { document.getElementById('note-modal').style.display = 'none'; }
+function saveNote() { localStorage.setItem('note_team_'+editingIM, document.getElementById('note-text').value); closeModal(); renderContent(); }
+updateTeamMetrics(); renderContent();
+</script>
+</body>
+</html>
