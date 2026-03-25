@@ -2,12 +2,12 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>ParentSquare - Total Team Strategy</title>
+  <title>ParentSquare - Total Team Workload</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      /* Official ParentSquare Palette  */
+      /* Official ParentSquare Palette [cite: 110-119] */
       --ps-green: #85ad33;
       --ps-dark-green: #618025;
       --ps-blue: #7bbaf0;
@@ -27,7 +27,7 @@
     .logo img { height: 40px; width: auto; } 
     .header-text h1 { color: var(--ps-green); margin: 0; font-size: 24px; font-weight: 700; line-height: 1.2; }
 
-    /* Summary Cards */
+    /* Summary Area */
     .summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 32px; }
     .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.05); border-top: 4px solid var(--ps-green); min-height: 120px; display: flex; flex-direction: column; justify-content: center; }
     .card .main-val { font-size: 22px; font-weight: 700; color: var(--ps-dark-green); }
@@ -47,17 +47,22 @@
     .controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; gap: 10px; flex-wrap: wrap; }
     .btn-action { background: white; border: 1px solid #ddd; padding: 6px 12px; cursor: pointer; font-size: 11px; font-weight: 600; border-radius: 4px; transition: 0.2s; }
     .btn-action.active { background: var(--ps-green) !important; color: white !important; border-color: var(--ps-green) !important; }
+    .btn-sort.active-sort { background: var(--ps-blue); color: white; border-color: var(--ps-blue); }
 
-    /* Table Formatting [cite: 74-80] */
-    table { width: 100%; border-collapse: collapse; background: white; border: 1px solid #eee; font-size: 12px; margin-bottom: 20px; }
+    /* Table & Cards [cite: 74-80] */
+    table { width: 100%; border-collapse: collapse; background: white; border: 1px solid #eee; font-size: 12px; margin-bottom: 10px; }
     th { background: #f9f9f9; color: var(--ps-dark-gray); padding: 10px; text-align: left; font-size: 10px; text-transform: uppercase; border-bottom: 2px solid #ddd; }
     td { padding: 10px; border-bottom: 1px solid #eee; vertical-align: middle; }
     tbody tr:nth-child(even) { background-color: #fafafa; }
 
-    .review-card { background: var(--ps-light-green); border-left: 6pt solid var(--ps-green); padding: 20px; border-radius: 8px; margin-bottom: 15px; }
-    .alert-card { background: #fffaf0; border-left: 6pt solid var(--ps-red); padding: 15px; border-radius: 8px; margin-bottom: 10px; font-size: 12px; }
+    .im-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 15px; margin-bottom: 25px; }
+    .im-card { background: white; padding: 15px; border-radius: 6px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); border-top: 3px solid var(--ps-green); height: 180px; display: flex; flex-direction: column; justify-content: space-between; }
+    .im-card h3 { margin: 0; font-size: 14px; color: var(--ps-dark-green); }
 
-    .section-header { color: var(--ps-dark-green); border-bottom: 2px solid var(--ps-light-green); padding-bottom: 5px; margin: 35px 0 15px 0; font-size: 18px; }
+    /* Strategy Section */
+    .review-card { background: var(--ps-light-green); border-left: 6pt solid var(--ps-green); padding: 20px; border-radius: 8px; margin-bottom: 20px; }
+    .alert-card { background: #fffaf0; border-left: 6pt solid var(--ps-red); padding: 15px; border-radius: 8px; margin-bottom: 10px; font-size: 12px; }
+    .section-header { color: var(--ps-dark-green); border-bottom: 2px solid var(--ps-light-green); padding-bottom: 5px; margin: 35px 0 15px 0; font-size: 18px; font-weight: 700; }
 
     footer { text-align: center; padding: 40px; color: var(--ps-dark-gray); font-size: 10px; font-weight: 600; }
   </style>
@@ -72,7 +77,7 @@
     </div>
   </header>
 
-  <div class="summary" id="global-metrics">
+  <div class="summary">
     <div class="card">
         <div class="main-val"><span id="t-im-count">0</span> Total IMs</div>
         <div class="sub-val"><span id="t-deal-count">0</span> Deals</div>
@@ -89,7 +94,7 @@
             <div id="t-fill-deals" class="cap-fill-deals"></div>
             <div id="t-fill-projects" class="cap-fill-projects"></div>
         </div>
-        <div class="label">Filtered Team Capacity</div>
+        <div class="label">Team Capacity Used</div>
     </div>
     <div class="card">
         <div style="background-color: var(--ps-light-red); padding: 4px 8px; border-radius: 4px; display: inline-block; width: fit-content;">
@@ -106,9 +111,9 @@
     <div id="tab-reporting" class="sub-tab" onclick="switchSubTab('reporting')">Reporting</div>
   </div>
 
-  <div class="controls" style="margin-bottom: 30px; border-bottom: 1px solid #ddd; padding-bottom: 15px;">
+  <div class="controls" style="margin-bottom: 25px; border-bottom: 1px solid #ddd; padding-bottom: 15px;">
     <div class="control-group">
-      <span style="font-size: 11px; font-weight: 700; color: #888; text-transform: uppercase;">Regional View:</span>
+      <span style="font-size: 10px; font-weight: 700; color: #888; text-transform: uppercase;">Regional View:</span>
       <button class="btn-action filter-tz active" onclick="setTZFilter('all', this)">All Regions</button>
       <button class="btn-action filter-tz" onclick="setTZFilter('EST', this)">EST</button>
       <button class="btn-action filter-tz" onclick="setTZFilter('CST', this)">CST</button>
@@ -130,7 +135,7 @@
     <div class="section-header">Manual Rotation Removal</div>
     <div style="background:white; padding:20px; border-radius:8px; border:1px solid #ddd; display:flex; gap:15px; align-items:center;">
         <label style="font-size:12px; font-weight:700;">Select IM:</label>
-        <select id="manual-im-select" style="padding:6px; font-size:12px;"></select>
+        <select id="manual-im-select" style="padding:6px; font-size:12px; width:200px;"></select>
         <button class="btn-action active" onclick="triggerManualRemoval()">Remove from Rotation</button>
     </div>
 
@@ -141,11 +146,11 @@
   <div id="view-reporting" class="tab-content" style="display:none;">
     <div style="padding:60px; border:2px dashed #ccc; border-radius:8px; text-align:center; background:white;">
       <h2 style="color:#aaa;">Team Trend Reporting</h2>
-      <p style="color:#888;">Fiscal Quarter capacity trends visualization placeholder.</p>
+      <p style="color:#888;">Quarterly Capacity Trend Placeholder.</p>
     </div>
   </div>
 
-  <footer>© 2026 ParentSquare • Implementation Manager Dashboard</footer>
+  <footer>© 2026 ParentSquare • Total Team Workload</footer>
 </div>
 
 <script>
@@ -156,15 +161,15 @@ const ADJ_OPTIONS = ["Extended Launch", "Proof of Concept", "Pilots", "DSAs/DUAs
 
 let currentTZ = 'all', activeTab = 'roster';
 
-// Roster: 24 Named IMs (All >= 50% capacity)
+// Roster: 24 IMs (All >= 50% capacity)
 let teamData = [
   { name: "Alex Rivers", tz: "EST", tier: "T4", dealPts: 60, projPts: 15, deals: 10, projects: 2, pd: 0, y: 1, r: 0, velocity: 2, med: true, lg: true, manualNote: "" },
-  { name: "Jordan Miller", tz: "EST", tier: "T3", dealPts: 70, projPts: 5, deals: 11, projects: 1, pd: 0, y: 0, r: 0, velocity: 3, med: true, lg: true, manualNote: "" },
-  { name: "Casey Smith", tz: "EST", tier: "T2", dealPts: 50, projPts: 10, deals: 8, projects: 2, pd: 1, y: 1, r: 0, velocity: 1, med: true, lg: false, manualNote: "" },
-  { name: "Morgan Lane", tz: "CST", tier: "T1", dealPts: 35, projPts: 10, deals: 9, projects: 2, pd: 0, y: 0, r: 1, velocity: 6, med: true, lg: false, manualNote: "" },
+  { name: "Jordan Miller", tz: "EST", tier: "T3", dealPts: 65, projPts: 5, deals: 11, projects: 1, pd: 0, y: 0, r: 0, velocity: 3, med: true, lg: true, manualNote: "" },
+  { name: "Casey Smith", tz: "EST", tier: "T2", dealPts: 55, projPts: 10, deals: 8, projects: 2, pd: 1, y: 1, r: 0, velocity: 1, med: true, lg: false, manualNote: "" },
+  { name: "Morgan Lane", tz: "CST", tier: "T1", dealPts: 45, projPts: 10, deals: 9, projects: 2, pd: 0, y: 0, r: 1, velocity: 6, med: true, lg: false, manualNote: "" },
   { name: "Riley West", tz: "CST", tier: "T4", dealPts: 95, projPts: 25, deals: 15, projects: 3, pd: 0, y: 2, r: 1, velocity: 4, med: true, lg: true, manualNote: "" },
-  { name: "Taylor Brooks", tz: "PST", tier: "T3", dealPts: 80, projPts: 10, deals: 12, projects: 1, pd: 1, y: 1, r: 0, velocity: 3, med: true, lg: true, manualNote: "" },
-  { name: "Quinn Jones", tz: "PST", tier: "T2", dealPts: 45, projPts: 5, deals: 7, projects: 1, pd: 0, y: 0, r: 0, velocity: 2, med: true, lg: false, manualNote: "" },
+  { name: "Taylor Brooks", tz: "PST", tier: "T3", dealPts: 85, projPts: 10, deals: 12, projects: 1, pd: 1, y: 1, r: 0, velocity: 3, med: true, lg: true, manualNote: "" },
+  { name: "Quinn Jones", tz: "PST", tier: "T2", dealPts: 50, projPts: 5, deals: 7, projects: 1, pd: 0, y: 0, r: 0, velocity: 2, med: true, lg: false, manualNote: "" },
   { name: "Skyler Page", tz: "EST", tier: "T5", dealPts: 45, projPts: 10, deals: 8, projects: 2, pd: 0, y: 0, r: 0, velocity: 1, med: true, lg: false, manualNote: "" },
   { name: "Dakota Hayes", tz: "CST", tier: "T4", dealPts: 115, projPts: 10, deals: 16, projects: 1, pd: 1, y: 1, r: 2, velocity: 4, med: true, lg: true, manualNote: "" },
   { name: "Jamie Frost", tz: "PST", tier: "T3", dealPts: 65, projPts: 20, deals: 10, projects: 2, pd: 0, y: 0, r: 0, velocity: 2, med: true, lg: true, manualNote: "" },
@@ -204,13 +209,14 @@ function switchSubTab(tab) {
 
 function triggerManualRemoval() {
     const name = document.getElementById('manual-im-select').value;
-    const note = prompt(`Enter reason for removing ${name} from rotation (e.g., Vacation):`);
+    const note = prompt(`Enter removal reason for ${name} (e.g., Vacation):`);
     if (note) {
-        const im = teamData.find(i => i.name === name);
-        im.manualNote = note;
+        teamData.find(i => i.name === name).manualNote = note;
         renderContent();
     }
 }
+
+function resumeIM(name) { teamData.find(i => i.name === name).manualNote = ""; renderContent(); }
 
 function renderContent() {
     if (activeTab === 'roster') renderRoster();
@@ -230,37 +236,36 @@ function renderRoster() {
 function renderAssignment() {
     const filtered = currentTZ === 'all' ? teamData : teamData.filter(im => im.tz === currentTZ);
     
-    // 1. Queue
+    // 1. New Deal Queue
     const qContainer = document.getElementById('deal-queue-container');
     qContainer.innerHTML = dealQueue.map(deal => {
         const total = SIZE_PTS[deal.size] + SIS_PTS[deal.sis] + deal.adj.length;
         return `<div class="review-card">
             <div style="display:flex; justify-content:space-between;">
                 <div><h4>${deal.name} (${deal.tz})</h4>
-                <p style="font-size:11px; margin:5px 0;">Base: ${deal.size} (${SIZE_PTS[deal.size]}) + ${deal.sis} (${SIS_PTS[deal.sis]})</p>
+                <p style="font-size:11px; color:#666; margin:5px 0;">Base: ${deal.size} (${SIZE_PTS[deal.size]}) + ${deal.sis} (${SIS_PTS[deal.sis]})</p>
                 <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:5px;">
                     ${ADJ_OPTIONS.map(opt => `<label style="font-size:10px;"><input type="checkbox" onchange="updateQAdj(${deal.id},'${opt}')" ${deal.adj.includes(opt)?'checked':''}> ${opt} (+1)</label>`).join('')}
                 </div></div>
                 <div style="text-align:right;"><div style="font-size:16px; font-weight:700;">Projected: [${total}]</div>
-                <select style="margin:10px 0; padding:4px;">${filtered.map(im => `<option>${im.name}</option>`).join('')}</select>
+                <select style="margin:10px 0; padding:4px; font-size:11px;">${filtered.map(im => `<option>${im.name}</option>`).join('')}</select>
                 <button class="btn-action active">Confirm</button></div>
             </div></div>`;
     }).join('');
 
-    // 2. Alerts
+    // 2. Rotation Removal Alerts
     const aContainer = document.getElementById('alerts-container');
     const flagged = filtered.filter(im => (im.dealPts+im.projPts)/MPC_VALUES[im.tier] >= 1.0 || im.velocity > 5 || im.manualNote);
     aContainer.innerHTML = flagged.map(im => `
         <div class="alert-card"><div style="display:flex; justify-content:space-between; align-items:center;">
-        <div><b>${im.name}</b> - Reason: ${im.manualNote || (im.velocity>5?'High Velocity':'Capacity Overload')}</div>
-        <div style="display:flex; gap:10px;"><button class="btn-action" onclick="resumeIM('${im.name}')">Resume</button>Schedule: <input type="date" style="font-size:10px;"></div>
+        <div><b>${im.name} (${im.tz})</b> - Reason: ${im.manualNote || (im.velocity>5?'High Velocity':'Capacity Overload')}</div>
+        <div style="display:flex; gap:10px;"><button class="btn-action" onclick="resumeIM('${im.name}')">Resume</button>Resume On: <input type="date" style="font-size:10px;"></div>
         </div></div>`).join('');
 
-    // 3. Manual Dropdown
-    const select = document.getElementById('manual-im-select');
-    select.innerHTML = filtered.map(im => `<option>${im.name}</option>`).join('');
+    // 3. Manual Removal Dropdown
+    document.getElementById('manual-im-select').innerHTML = filtered.map(im => `<option>${im.name}</option>`).join('');
 
-    // 4. Eligibility
+    // 4. IM Account Eligibility
     const eContainer = document.getElementById('eligibility-container');
     eContainer.innerHTML = `<table><thead><tr><th>Name</th><th>Med Accounts</th><th>Lg/Ent Accounts</th></tr></thead>
         <tbody>${filtered.map(im => `<tr><td><b>${im.name}</b></td>
@@ -269,7 +274,6 @@ function renderAssignment() {
 }
 
 function updateQAdj(id, opt) { const d = dealQueue.find(x => x.id === id); const i = d.adj.indexOf(opt); i > -1 ? d.adj.splice(i,1) : d.adj.push(opt); renderAssignment(); }
-function resumeIM(name) { teamData.find(i => i.name === name).manualNote = ""; renderContent(); }
 
 function updateMetrics() {
     let tdP=0, tpP=0, tM=0, spC=0, pdC=0, yR=0, rR=0, dC=0;
