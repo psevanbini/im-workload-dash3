@@ -7,7 +7,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      /* Official ParentSquare Palette [cite: 110-119] */
+      /* Official ParentSquare Palette  */
       --ps-green: #85ad33;
       --ps-dark-green: #618025;
       --ps-blue: #7bbaf0;
@@ -29,7 +29,7 @@
 
     /* Summary Cards */
     .summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 32px; }
-    .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.05); border-top: 4px solid var(--ps-green); min-height: 120px; display: flex; flex-direction: column; justify-content: center; }
+    .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.05); border-top: 4px solid var(--ps-green); min-height: 130px; display: flex; flex-direction: column; justify-content: center; }
     .card .main-val { font-size: 22px; font-weight: 700; color: var(--ps-dark-green); }
     .card .sub-val { font-size: 13px; font-weight: 600; color: #777; margin-top: 4px; }
     .card .label { font-size: 10px; color: #888; text-transform: uppercase; font-weight: 700; margin-top: 8px; }
@@ -38,21 +38,19 @@
     .cap-fill-deals { height: 100%; background: var(--ps-green); transition: width 0.5s; }
     .cap-fill-projects { height: 100%; background: var(--ps-blue); transition: width 0.5s; }
 
-    /* Tab Navigation */
+    /* Sub-Tab Navigation */
     .sub-tabs { display: flex; gap: 24px; border-bottom: 2px solid #ddd; margin-bottom: 24px; }
     .sub-tab { padding-bottom: 12px; cursor: pointer; font-weight: 600; color: #666; font-size: 13px; position: relative; }
     .sub-tab.active { color: var(--ps-green); border-bottom: 4px solid var(--ps-green); }
 
-    /* Group Headers [cite: 25-32] */
-    .group-header { background: var(--ps-light-green); color: var(--ps-dark-green); padding: 8px 12px; margin: 20px 0 10px 0; font-weight: 700; font-size: 11px; text-transform: uppercase; border-radius: 4px; border-left: 4px solid var(--ps-dark-green); }
-
-    .controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; gap: 15px; flex-wrap: wrap; }
+    /* Controls */
+    .controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; gap: 10px; flex-wrap: wrap; }
     .control-group { display: flex; align-items: center; gap: 8px; }
     .btn-action { background: white; border: 1px solid #ddd; padding: 6px 12px; cursor: pointer; font-size: 11px; font-weight: 600; border-radius: 4px; transition: 0.2s; }
     .btn-action.active { background: var(--ps-green) !important; color: white !important; border-color: var(--ps-green) !important; }
     .btn-sort.active-sort { background: var(--ps-blue); color: white; border-color: var(--ps-blue); }
 
-    /* Tables & Cards [cite: 66-80] */
+    /* Table & Cards */
     table { width: 100%; border-collapse: collapse; background: white; border: 1px solid #eee; font-size: 12px; margin-bottom: 10px; }
     th { background: #f9f9f9; color: var(--ps-dark-gray); padding: 10px; text-align: left; font-size: 10px; text-transform: uppercase; border-bottom: 2px solid #ddd; }
     td { padding: 10px; border-bottom: 1px solid #eee; vertical-align: middle; }
@@ -64,6 +62,8 @@
 
     .review-card { background: var(--ps-light-green); border-left: 6pt solid var(--ps-green); padding: 20px; border-radius: 8px; margin-bottom: 20px; }
     .alert-card { background: #fffaf0; border-left: 6pt solid var(--ps-red); padding: 15px; border-radius: 8px; margin-bottom: 10px; }
+
+    .group-header { background: var(--ps-light-green); color: var(--ps-dark-green); padding: 8px 12px; margin: 20px 0 10px 0; font-weight: 700; font-size: 11px; text-transform: uppercase; border-radius: 4px; border-left: 4px solid var(--ps-dark-green); }
 
     footer { text-align: center; padding: 40px; color: var(--ps-dark-gray); font-size: 10px; font-weight: 600; }
   </style>
@@ -81,7 +81,8 @@
   <div class="summary">
     <div class="card">
         <div class="main-val"><span id="t-im-count">0</span> Total IMs</div>
-        <div class="sub-val"><span id="t-strat-proj">0</span> Strategic Projects</div>
+        <div class="sub-val"><span id="t-deal-count">0</span> Implementation Deals</div>
+        <div class="sub-val" style="margin-top:0;"><span id="t-strat-proj">0</span> Strategic Projects</div>
     </div>
     <div class="card">
         <div class="main-val"><span id="t-total-pts">0</span> / <span id="t-max-pts">0</span> Total Points</div>
@@ -94,7 +95,7 @@
             <div id="t-fill-deals" class="cap-fill-deals"></div>
             <div id="t-fill-projects" class="cap-fill-projects"></div>
         </div>
-        <div class="label">Filtered Team Capacity</div>
+        <div class="label">Total Team Capacity</div>
     </div>
     <div class="card">
         <div style="background-color: var(--ps-light-red); padding: 4px 8px; border-radius: 4px; display: inline-block; width: fit-content;">
@@ -118,7 +119,6 @@
         <button id="btn-card" class="btn-action" onclick="switchLayout('card')">Card View</button>
       </div>
       <div class="control-group">
-        <span style="font-size: 10px; font-weight: 700; color: #888; text-transform: uppercase;">Time Zone:</span>
         <button class="btn-action filter-tz active" onclick="setTZFilter('all', this)">All</button>
         <button class="btn-action filter-tz" onclick="setTZFilter('EST', this)">EST</button>
         <button class="btn-action filter-tz" onclick="setTZFilter('CST', this)">CST</button>
@@ -144,7 +144,7 @@
   <div id="view-reporting" class="tab-content" style="display:none;">
     <div style="padding:60px; border:2px dashed #ccc; border-radius:8px; text-align:center; background:white;">
       <h2 style="color:#aaa;">Team Trend Reporting</h2>
-      <p style="color:#888;">Data trends by fiscal quarter placeholder.</p>
+      <p style="color:#888;">Quarterly Capacity Trend Visualization Placeholder.</p>
     </div>
   </div>
 
@@ -180,42 +180,25 @@ function renderAssignment() {
   const qContainer = document.getElementById('deal-queue-container');
   qContainer.innerHTML = dealQueue.map(deal => {
     const basePts = (SIZE_PTS[deal.size] || 0) + (SIS_PTS[deal.sis] || 0);
-    const totalPts = basePts + deal.adj.length;
     return `<div class="review-card">
       <div style="display:flex; justify-content:space-between;">
         <div>
           <h4 style="margin:0;">${deal.name}</h4>
-          <p style="font-size:11px; color:#666; margin:5px 0;">Base: ${deal.size} (${SIZE_PTS[deal.size]}) + ${deal.sis} (${SIS_PTS[deal.sis]})</p>
+          <p style="font-size:11px; color:#666;">Base: ${deal.size} (${SIZE_PTS[deal.size]}) + ${deal.sis} (${SIS_PTS[deal.sis]})</p>
           <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap: 5px;">
-            ${ADJ_OPTIONS.map(opt => `<label style="font-size:10px;"><input type="checkbox" ${deal.adj.includes(opt)?'checked':''} onchange="updateQueueAdj(${deal.id},'${opt}')"> ${opt} (+1)</label>`).join('')}
+            ${ADJ_OPTIONS.map(opt => `<label style="font-size:10px;"><input type="checkbox" onchange="updateQueueAdj(${deal.id},'${opt}')"> ${opt} (+1)</label>`).join('')}
           </div>
         </div>
         <div style="text-align:right;">
-          <div style="font-size:16px; font-weight:700; color:var(--ps-dark-green); margin-bottom:10px;">Projected Total: [${totalPts}]</div>
-          <select style="font-size:11px; padding:5px; margin-right:10px;">
-            ${teamData.filter(im => im.velocity <= 5 && (im.dealPts+im.projPts)/MPC_VALUES[im.tier] < 1.0).map(im => `<option>${im.name} (${Math.round(((im.dealPts+im.projPts)/MPC_VALUES[im.tier])*100)}%)</option>`).join('')}
+          <div style="font-size:16px; font-weight:700; color:var(--ps-dark-green);">Projected: [${basePts + deal.adj.length}]</div>
+          <select style="font-size:11px; padding:5px; margin-top:10px;">
+            ${teamData.map(im => `<option>${im.name} (${Math.round(((im.dealPts+im.projPts)/MPC_VALUES[im.tier])*100)}%)</option>`).join('')}
           </select>
-          <button class="btn-action active" onclick="alert('Assigned')">Confirm Assignment</button>
+          <button class="btn-action active" style="display:block; width:100%; margin-top:5px;" onclick="alert('Assigned')">Confirm</button>
         </div>
       </div>
     </div>`;
   }).join('');
-
-  const aContainer = document.getElementById('alerts-container');
-  const removals = teamData.filter(im => (im.dealPts+im.projPts)/MPC_VALUES[im.tier] >= 1.0 || im.velocity > 5);
-  aContainer.innerHTML = removals.map(im => `
-    <div class="alert-card">
-      <div style="display:flex; justify-content:space-between; align-items:center;">
-        <div><b>${im.name} (${im.tz})</b> - Flagged for ${im.velocity > 5 ? 'High Velocity ('+im.velocity+')' : 'Capacity Overload ('+Math.round(((im.dealPts+im.projPts)/MPC_VALUES[im.tier])*100)+'%)'}</div>
-        <div style="display:flex; gap:10px;"><button class="btn-action" style="border-color:var(--ps-green); color:var(--ps-green);" onclick="this.closest('.alert-card').remove()">Add Back</button> Schedule: <input type="date" style="font-size:10px;"></div>
-      </div>
-    </div>`).join('');
-
-  const eContainer = document.getElementById('eligibility-container');
-  eContainer.innerHTML = `<table><thead><tr><th>Name</th><th>Tier</th><th>Med</th><th>Lg/Ent</th></tr></thead>
-    <tbody>${teamData.map(im => `<tr><td><b>${im.name}</b></td><td>${im.tier}</td>
-    <td><input type="checkbox" ${im.medEligible?'checked':''}></td>
-    <td><input type="checkbox" ${im.lgEligible?'checked':''}></td></tr>`).join('')}</tbody></table>`;
 }
 
 function updateQueueAdj(dealId, opt) {
@@ -226,13 +209,17 @@ function updateQueueAdj(dealId, opt) {
 }
 
 function updateMetrics() {
-    let tdP=0, tpP=0, tM=0, spC=0, pdC=0, yR=0, rR=0;
+    let tdP=0, tpP=0, tM=0, spC=0, pdC=0, yR=0, rR=0, dealC=0;
     const filtered = currentTZ === 'all' ? teamData : teamData.filter(im => im.tz === currentTZ);
-    filtered.forEach(im => { tdP += im.dealPts; tpP += im.projPts; tM += MPC_VALUES[im.tier]; spC += im.projects; pdC += im.pd; yR += im.y; rR += im.r; });
-    const cap = Math.round(((tdP+tpP)/tM)*100);
+    filtered.forEach(im => { 
+        tdP += im.dealPts; tpP += im.projPts; tM += MPC_VALUES[im.tier]; 
+        spC += im.projects; pdC += im.pd; yR += im.y; rR += im.r; dealC += im.deals;
+    });
+    const totalP = tdP + tpP, cap = Math.round((totalP / tM) * 100);
     document.getElementById('t-im-count').innerText = filtered.length;
+    document.getElementById('t-deal-count').innerText = dealC;
     document.getElementById('t-strat-proj').innerText = spC;
-    document.getElementById('t-total-pts').innerText = (tdP+tpP);
+    document.getElementById('t-total-pts').innerText = totalP;
     document.getElementById('t-max-pts').innerText = tM;
     document.getElementById('t-deal-pts').innerText = tdP;
     document.getElementById('t-proj-pts').innerText = tpP;
@@ -262,21 +249,21 @@ function renderContent() {
     Object.keys(groups).forEach(key => {
         const h = document.createElement('div'); h.className = 'group-header'; h.innerText = key; display.appendChild(h);
         if (currentLayout === 'list') {
-            const t = document.createElement('table'); t.innerHTML = `<thead><tr><th>TZ</th><th>Name</th><th>Deals (Pts)</th><th>Projs (Pts)</th><th>% Cap</th><th>Risks (Y/R|P)</th></tr></thead><tbody></tbody>`;
+            const t = document.createElement('table');
+            t.innerHTML = `<thead><tr><th>TZ</th><th>Name</th><th>Deals (Pts)</th><th>Projs (Pts)</th><th>% Cap</th><th>Risks (Y/R|P)</th></tr></thead><tbody></tbody>`;
             display.appendChild(t); const b = t.querySelector('tbody');
             groups[key].forEach(im => {
                 const pct = Math.round(((im.dealPts+im.projPts)/MPC_VALUES[im.tier])*100);
-                const c = pct >= 90 ? 'var(--ps-red)' : (pct >= 80 ? 'var(--ps-gold)' : 'var(--ps-green)');
-                b.innerHTML += `<tr><td><b>${im.tz}</b></td><td><b>${im.name}</b></td><td>${im.deals} (${im.dealPts})</td><td>${im.projects} (${im.projPts})</td><td><span style="color:${c}; font-weight:700;">${pct}%</span></td><td>${im.y}Y/${im.r}R|<b style="${im.pd>0?'color:var(--ps-red)':''}">${im.pd}P</b></td></tr>`;
+                const color = pct >= 90 ? 'var(--ps-red)' : (pct >= 80 ? 'var(--ps-gold)' : 'var(--ps-green)');
+                b.innerHTML += `<tr><td><b>${im.tz}</b></td><td><b>${im.name}</b></td><td>${im.deals} (${im.dealPts})</td><td>${im.projects} (${im.projPts})</td><td><span style="color:${color}; font-weight:700;">${pct}%</span></td><td>${im.y}Y/${im.r}R|<b style="${im.pd>0?'color:var(--ps-red)':''}">${im.pd}P</b></td></tr>`;
             });
         } else {
             const grid = document.createElement('div'); grid.className = 'im-grid'; display.appendChild(grid);
             groups[key].forEach(im => {
-                const m = MPC_VALUES[im.tier], pct = Math.round(((im.dealPts+im.projPts)/m)*100);
-                const c = pct >= 90 ? 'var(--ps-red)' : (pct >= 80 ? 'var(--ps-gold)' : 'var(--ps-green)');
+                const m = MPC_VALUES[im.tier], pct = Math.round(((im.dealPts+im.projPts)/m)*100), c = pct >= 90 ? 'var(--ps-red)' : (pct >= 80 ? 'var(--ps-gold)' : 'var(--ps-green)');
                 grid.innerHTML += `<div class="im-card" style="border-top-color:${c}">
                     <div style="display:flex; justify-content:space-between;"><div><h3>${im.name}</h3><span style="font-size:9px; color:#888;">${im.tz} • T${im.tier.slice(1)}</span></div><span style="font-weight:700; color:${c}; font-size:12px;">${pct}%</span></div>
-                    <div style="font-size:11px; color:#666;">Pts: <b>${im.dealPts+im.projPts}</b>/${m} | Deals: ${im.deals}<br>Risks: ${im.y}Y/${im.r}R | Projects past due: <b style="${im.pd>0?'color:var(--ps-red)':''}">${im.pd}</b></div>
+                    <div class="stats">Pts: <b>${im.dealPts+im.projPts}</b>/${m} | Deals: ${im.deals}<br>Risks: ${im.y}Y/${im.r}R | Projects past due: <b style="${im.pd > 0 ? 'color:var(--ps-red);' : ''}">${im.pd}</b></div>
                     <div class="summary-cap-bar" style="height:6px;"><div style="width:${(im.dealPts/m)*100}%; background:var(--ps-green);"></div><div style="width:${(im.projPts/m)*100}%; background:var(--ps-blue);"></div></div>
                 </div>`;
             });
